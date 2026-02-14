@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>¿Quieres ser mi Valentine?</title>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+    font-family: 'Georgia', serif;
+    overflow: hidden;
+    color: #f0f0f0;
+}
+
+/* MARCO FLORAL */
+.floral-frame {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.floral-frame svg {
+    width: 100%;
+    height: 100%;
+}
+
+/* Flores y hojas animadas */
+.flower {
+    opacity: 0;
+    animation: growFlower 2s ease-out forwards;
+}
+
+.leaf {
+    opacity: 0;
+    animation: growLeaf 1.5s ease-out forwards;
+}
+
+.stem {
+    stroke: #4a7c59;
+    stroke-width: 3;
+    fill: none;
+    stroke-dasharray: 500;
+    stroke-dashoffset: 500;
+    animation: drawStem 2s ease-out forwards;
+}
+
+.petal {
+    fill: url(#petalGradient);
+}
+
+.flower-center {
+    fill: #ff6b9d;
+}
+
+.small-heart {
+    fill: #ff4757;
+    opacity: 0;
+    animation: fadeIn 1s ease-in forwards;
+}
+
+.vine {
+    stroke: #5a9367;
+    stroke-width: 2.5;
+    fill: none;
+    stroke-dasharray: 800;
+    stroke-dashoffset: 800;
+    animation: drawVine 3s ease-out forwards;
+}
+
+/* CONTENEDOR PRINCIPAL */
+.container {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    opacity: 0;
+    animation: fadeIn 1.5s forwards;
+    animation-delay: 3.5s;
+    background: rgba(255, 255, 255, 0.08);
+    padding: 50px 60px;
+    border-radius: 20px;
+    backdrop-filter: blur(15px);
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    pointer-events: auto;
+}
+
+h1 {
+    font-weight: 400;
+    font-size: 2.5rem;
+    margin-bottom: 40px;
+    letter-spacing: 1px;
+    color: #ffd9e8;
+    text-shadow: 0 2px 10px rgba(255, 107, 157, 0.3);
+}
+
+.button-container {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+button {
+    padding: 14px 40px;
+    font-size: 18px;
+    font-family: 'Georgia', serif;
+    border-radius: 10px;
+    border: 2px solid;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    pointer-events: auto;
+}
+
+#yesBtn {
+    border-color: #ff6b9d;
+    color: #ff6b9d;
+}
+
+#yesBtn:hover {
+    background: #ff6b9d;
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(255, 107, 157, 0.5);
+}
+
+#noBtn {
+    border-color: #a8dadc;
+    color: #a8dadc;
+    position: relative;
+    transition: transform 0.2s ease;
+}
+
+/* MENSAJE FINAL CON STICKER */
+#finalMessage {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 15;
+    opacity: 0;
+    transition: opacity 1.5s ease;
+    text-align: center;
+    pointer-events: none;
+}
+
+.sticker-container {
+    background: rgba(30, 41, 59, 0.95);
+    padding: 60px 80px;
+    border-radius: 30px;
+    border: 3px solid rgba(255, 182, 193, 0.3);
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
+    position: relative;
+}
+
+.cute-bears {
+    font-size: 80px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    position: relative;
+}
+
+.bear {
+    animation: bounce 1s ease-in-out infinite;
+}
+
+.bear:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.heart-above {
+    position: absolute;
+    top: -30px;
+    font-size: 30px;
+    animation: heartbeat 1.5s ease-in-out infinite;
+}
+
+.message-title {
+    font-size: 2rem;
+    color: #ffd9e8;
+    margin-bottom: 25px;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+.message-text {
+    font-size: 1.3rem;
+    line-height: 1.8;
+    color: #f8f8f8;
+    margin-bottom: 20px;
+    font-style: italic;
+}
+
+.message-ending {
+    font-size: 1.6rem;
+    color: #ff6b9d;
+    font-weight: 600;
+    margin-top: 15px;
+}
+
+/* CORAZONES FLOTANTES */
+.heart {
+    position: fixed;
+    color: #ff6b9d;
+    font-size: 25px;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 5;
+}
+
+/* ANIMACIONES */
+@keyframes drawStem {
+    to { stroke-dashoffset: 0; }
+}
+
+@keyframes drawVine {
+    to { stroke-dashoffset: 0; }
+}
+
+@keyframes growFlower {
+    0% {
+        opacity: 0;
+        transform: scale(0) rotate(-45deg);
+    }
+    50% {
+        opacity: 0.7;
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+    }
+}
+
+@keyframes growLeaf {
+    0% {
+        opacity: 0;
+        transform: scale(0);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes fadeIn {
+    to { opacity: 1; }
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-120vh) rotate(720deg);
+        opacity: 0;
+    }
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+}
+
+@keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+}
+
+@media (max-width: 768px) {
+    h1 { font-size: 2rem; }
+    .container { padding: 40px 40px; }
+    .sticker-container { padding: 40px 50px; }
+    .message-title { font-size: 1.5rem; }
+    .message-text { font-size: 1.1rem; }
+    .cute-bears { font-size: 60px; }
+}
+</style>
+</head>
+<body>
+
+<!-- MARCO FLORAL DECORATIVO -->
+<div class="floral-frame">
+    <svg viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <!-- Gradiente para pétalos -->
+            <linearGradient id="petalGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#ff6b9d;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#ff8fab;stop-opacity:1" />
+            </linearGradient>
+        </defs>
+
+        <!-- LADO IZQUIERDO -->
+        <!-- Tallo principal izquierdo -->
+        <path class="stem" d="M 80 300 Q 90 250 95 200 Q 98 150 100 100" style="animation-delay: 0s"/>
+        
+        <!-- Enredadera decorativa izquierda -->
+        <path class="vine" d="M 100 100 Q 110 90 120 85 Q 140 75 160 80" style="animation-delay: 0.5s"/>
+        <path class="vine" d="M 95 180 Q 75 175 60 180 Q 45 185 40 195" style="animation-delay: 0.7s"/>
+        <path class="vine" d="M 98 250 Q 80 245 65 250 Q 50 255 45 265" style="animation-delay: 0.9s"/>
+        
+        <!-- Flores izquierda -->
+        <g class="flower" style="animation-delay: 1.5s">
+            <circle class="petal" cx="100" cy="100" r="12"/>
+            <circle class="petal" cx="115" cy="105" r="12"/>
+            <circle class="petal" cx="115" cy="125" r="12"/>
+            <circle class="petal" cx="100" cy="130" r="12"/>
+            <circle class="petal" cx="85" cy="125" r="12"/>
+            <circle class="petal" cx="85" cy="105" r="12"/>
+            <circle class="flower-center" cx="100" cy="115" r="8"/>
+        </g>
+
+        <g class="flower" style="animation-delay: 2s">
+            <circle class="petal" cx="95" cy="200" r="10"/>
+            <circle class="petal" cx="108" cy="203" r="10"/>
+            <circle class="petal" cx="108" cy="218" r="10"/>
+            <circle class="petal" cx="95" cy="221" r="10"/>
+            <circle class="petal" cx="82" cy="218" r="10"/>
+            <circle class="petal" cx="82" cy="203" r="10"/>
+            <circle class="flower-center" cx="95" cy="211" r="6"/>
+        </g>
+
+        <g class="flower" style="animation-delay: 2.5s">
+            <circle class="petal" cx="80" cy="300" r="13"/>
+            <circle class="petal" cx="96" cy="306" r="13"/>
+            <circle class="petal" cx="96" cy="327" r="13"/>
+            <circle class="petal" cx="80" cy="333" r="13"/>
+            <circle class="petal" cx="64" cy="327" r="13"/>
+            <circle class="petal" cx="64" cy="306" r="13"/>
+            <circle class="flower-center" cx="80" cy="317" r="9"/>
+        </g>
+
+        <!-- Hojas izquierda -->
+        <ellipse class="leaf" cx="110" cy="150" rx="15" ry="8" fill="#5a9367" style="animation-delay: 1.8s"/>
+        <ellipse class="leaf" cx="75" cy="165" rx="12" ry="7" fill="#5a9367" style="animation-delay: 2.1s"/>
+        <ellipse class="leaf" cx="108" cy="240" rx="13" ry="7" fill="#5a9367" style="animation-delay: 2.3s"/>
+        <ellipse class="leaf" cx="70" cy="270" rx="14" ry="8" fill="#5a9367" style="animation-delay: 2.6s"/>
+
+        <!-- Corazones pequeños izquierda -->
+        <text class="small-heart" x="60" y="140" font-size="12" style="animation-delay: 2.5s">❤</text>
+        <text class="small-heart" x="125" y="175" font-size="10" style="animation-delay: 2.7s">❤</text>
+        <text class="small-heart" x="55" y="230" font-size="11" style="animation-delay: 2.9s">❤</text>
+        <text class="small-heart" x="115" y="285" font-size="13" style="animation-delay: 3.1s">❤</text>
+
+        <!-- LADO DERECHO (espejo) -->
+        <!-- Tallo principal derecho -->
+        <path class="stem" d="M 720 300 Q 710 250 705 200 Q 702 150 700 100" style="animation-delay: 0s"/>
+        
+        <!-- Enredadera decorativa derecha -->
+        <path class="vine" d="M 700 100 Q 690 90 680 85 Q 660 75 640 80" style="animation-delay: 0.5s"/>
+        <path class="vine" d="M 705 180 Q 725 175 740 180 Q 755 185 760 195" style="animation-delay: 0.7s"/>
+        <path class="vine" d="M 702 250 Q 720 245 735 250 Q 750 255 755 265" style="animation-delay: 0.9s"/>
+        
+        <!-- Flores derecha -->
+        <g class="flower" style="animation-delay: 1.5s">
+            <circle class="petal" cx="700" cy="100" r="12"/>
+            <circle class="petal" cx="685" cy="105" r="12"/>
+            <circle class="petal" cx="685" cy="125" r="12"/>
+            <circle class="petal" cx="700" cy="130" r="12"/>
+            <circle class="petal" cx="715" cy="125" r="12"/>
+            <circle class="petal" cx="715" cy="105" r="12"/>
+            <circle class="flower-center" cx="700" cy="115" r="8"/>
+        </g>
+
+        <g class="flower" style="animation-delay: 2s">
+            <circle class="petal" cx="705" cy="200" r="10"/>
+            <circle class="petal" cx="692" cy="203" r="10"/>
+            <circle class="petal" cx="692" cy="218" r="10"/>
+            <circle class="petal" cx="705" cy="221" r="10"/>
+            <circle class="petal" cx="718" cy="218" r="10"/>
+            <circle class="petal" cx="718" cy="203" r="10"/>
+            <circle class="flower-center" cx="705" cy="211" r="6"/>
+        </g>
+
+        <g class="flower" style="animation-delay: 2.5s">
+            <circle class="petal" cx="720" cy="300" r="13"/>
+            <circle class="petal" cx="704" cy="306" r="13"/>
+            <circle class="petal" cx="704" cy="327" r="13"/>
+            <circle class="petal" cx="720" cy="333" r="13"/>
+            <circle class="petal" cx="736" cy="327" r="13"/>
+            <circle class="petal" cx="736" cy="306" r="13"/>
+            <circle class="flower-center" cx="720" cy="317" r="9"/>
+        </g>
+
+        <!-- Hojas derecha -->
+        <ellipse class="leaf" cx="690" cy="150" rx="15" ry="8" fill="#5a9367" style="animation-delay: 1.8s"/>
+        <ellipse class="leaf" cx="725" cy="165" rx="12" ry="7" fill="#5a9367" style="animation-delay: 2.1s"/>
+        <ellipse class="leaf" cx="692" cy="240" rx="13" ry="7" fill="#5a9367" style="animation-delay: 2.3s"/>
+        <ellipse class="leaf" cx="730" cy="270" rx="14" ry="8" fill="#5a9367" style="animation-delay: 2.6s"/>
+
+        <!-- Corazones pequeños derecha -->
+        <text class="small-heart" x="740" y="140" font-size="12" style="animation-delay: 2.5s">❤</text>
+        <text class="small-heart" x="675" y="175" font-size="10" style="animation-delay: 2.7s">❤</text>
+        <text class="small-heart" x="745" y="230" font-size="11" style="animation-delay: 2.9s">❤</text>
+        <text class="small-heart" x="685" y="285" font-size="13" style="animation-delay: 3.1s">❤</text>
+
+        <!-- PARTE INFERIOR - Enredaderas conectoras -->
+        <path class="vine" d="M 80 320 Q 200 340 400 335 Q 600 340 720 320" style="animation-delay: 1.2s"/>
+        
+        <!-- Hojas en la base -->
+        <ellipse class="leaf" cx="200" cy="345" rx="16" ry="9" fill="#5a9367" style="animation-delay: 2.8s"/>
+        <ellipse class="leaf" cx="400" cy="340" rx="18" ry="10" fill="#5a9367" style="animation-delay: 3s"/>
+        <ellipse class="leaf" cx="600" cy="345" rx="16" ry="9" fill="#5a9367" style="animation-delay: 3.2s"/>
+    </svg>
+</div>
+
+<div class="container" id="mainContent">
+    <h1>¿Quieres ser mi Valentine? 🌹</h1>
+    <div class="button-container">
+        <button id="yesBtn">Sí, por supuesto</button>
+        <button id="noBtn">No, gracias</button>
+    </div>
+</div>
+
+<div id="finalMessage">
+    <div class="sticker-container">
+        <div class="cute-bears">
+            <span class="bear">🐻</span>
+            <span class="heart-above">💕</span>
+            <span class="bear">🐻‍❄️</span>
+        </div>
+        <div class="message-title">Gracias mi vidaaaaaa</div>
+        <div class="message-text">
+            Por otro San Valentín juntos<br>
+            Eres la mejor te amo 3 millones
+        </div>
+        <div class="message-ending">&lt;3</div>
+    </div>
+</div>
+
+<script>
+const noBtn = document.getElementById("noBtn");
+const yesBtn = document.getElementById("yesBtn");
+const mainContent = document.getElementById("mainContent");
+const finalMessage = document.getElementById("finalMessage");
+
+let escapeCount = 0;
+
+// Crear corazones flotantes
+function createHeart() {
+    const heart = document.createElement('div');
+    heart.classList.add('heart');
+    heart.textContent = '♥';
+    heart.style.left = Math.random() * 100 + 'vw';
+    heart.style.animationDuration = (Math.random() * 3 + 3) + 's';
+    heart.style.fontSize = (Math.random() * 20 + 20) + 'px';
+    heart.style.animation = 'float linear forwards';
+    document.body.appendChild(heart);
+    
+    setTimeout(() => heart.remove(), 6000);
+}
+
+// Crear corazones flotantes de fondo (sutiles)
+function createBackgroundHearts() {
+    const floatingHeart = document.createElement('div');
+    floatingHeart.classList.add('heart');
+    floatingHeart.textContent = '💕';
+    floatingHeart.style.left = Math.random() * 100 + 'vw';
+    floatingHeart.style.top = '100vh';
+    floatingHeart.style.animationDuration = (Math.random() * 4 + 4) + 's';
+    floatingHeart.style.fontSize = (Math.random() * 15 + 10) + 'px';
+    floatingHeart.style.animation = 'float linear forwards';
+    floatingHeart.style.opacity = '0.3';
+    document.body.appendChild(floatingHeart);
+    
+    setTimeout(() => floatingHeart.remove(), 8000);
+}
+
+// Crear corazones de fondo periódicamente
+setInterval(createBackgroundHearts, 2000);
+
+// Botón "No" escapa
+noBtn.addEventListener("mouseenter", () => {
+    escapeCount++;
+    const maxMove = 120 + (escapeCount * 25);
+    const x = (Math.random() - 0.5) * maxMove * 2;
+    const y = (Math.random() - 0.5) * maxMove * 2;
+    noBtn.style.transform = `translate(${x}px, ${y}px)`;
+});
+
+// Al presionar "Sí"
+yesBtn.addEventListener("click", () => {
+    mainContent.style.transition = 'opacity 1.2s ease';
+    mainContent.style.opacity = '0';
+    
+    setTimeout(() => {
+        mainContent.style.display = 'none';
+        finalMessage.style.opacity = '1';
+        finalMessage.style.pointerEvents = 'auto';
+        
+        // Lluvia de corazones
+        for (let i = 0; i < 30; i++) {
+            setTimeout(createHeart, i * 150);
+        }
+    }, 1200);
+});
+
+// Reset del botón "No"
+document.addEventListener('mousemove', (e) => {
+    const rect = noBtn.getBoundingClientRect();
+    const distance = Math.sqrt(
+        Math.pow(e.clientX - (rect.left + rect.width / 2), 2) +
+        Math.pow(e.clientY - (rect.top + rect.height / 2), 2)
+    );
+    
+    if (distance > 350) {
+        noBtn.style.transition = 'transform 0.6s ease';
+        noBtn.style.transform = 'translate(0, 0)';
+        setTimeout(() => {
+            noBtn.style.transition = 'transform 0.2s ease';
+        }, 600);
+    }
+});
+</script>
+</body>
+</html>
